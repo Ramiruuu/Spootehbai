@@ -5,7 +5,7 @@ import { Button } from "../../../components/ui/Button";
 import { Input } from "../../../components/ui/Input";
 import { useAuth } from "../hooks/useAuth";
 
-export function RegisterForm(): JSX.Element {
+export function RegisterForm() {
   const { register, error, isLoading } = useAuth();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");

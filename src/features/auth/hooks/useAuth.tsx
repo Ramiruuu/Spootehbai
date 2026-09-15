@@ -56,11 +56,7 @@ async function persistAuthSession(
 /**
  * Provider that exposes the auth state to the rest of the application.
  */
-export function AuthProvider({
-  children,
-}: {
-  children: React.ReactNode;
-}): JSX.Element {
+export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<AuthError | null>(null);

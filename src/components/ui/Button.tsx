@@ -21,7 +21,7 @@ export function Button({
   disabled = false,
   variant = "primary",
   ...rest
-}: ButtonProps): JSX.Element {
+}: ButtonProps) {
   const isDisabled = disabled || loading;
 
   return (

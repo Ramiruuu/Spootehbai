@@ -4,7 +4,7 @@ import { ActivityIndicator, StyleSheet, View } from "react-native";
 
 import { AuthProvider, useAuth } from "../features/auth/hooks/useAuth";
 
-function AppGate(): JSX.Element {
+function AppGate() {
   const { user, isLoading } = useAuth();
   const segments = useSegments();
   const router = useRouter();
@@ -12,7 +12,7 @@ function AppGate(): JSX.Element {
   useEffect(() => {
     if (isLoading) return;
 
-    const isAuthRoute = segments[0] === "(auth)" || segments[0] === "auth";
+    const isAuthRoute = segments[0] === "login" || segments[0] === "register";
 
     if (!user && !isAuthRoute) {
       router.replace("/(auth)/login");
@@ -34,7 +34,7 @@ function AppGate(): JSX.Element {
   return <Slot />;
 }
 
-export default function RootLayout(): JSX.Element {
+export default function RootLayout() {
   return (
     <AuthProvider>
       <AppGate />

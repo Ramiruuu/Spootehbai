@@ -3,7 +3,7 @@ import {
     Text,
     TextInput,
     View,
-    type TextInputProps
+    type TextInputProps,
 } from "react-native";
 
 export type InputProps = TextInputProps & {
@@ -21,7 +21,7 @@ export function Input({
   error,
   secureTextEntry = false,
   ...rest
-}: InputProps): JSX.Element {
+}: InputProps) {
   const hasError = Boolean(error && error.trim().length > 0);
 
   return (

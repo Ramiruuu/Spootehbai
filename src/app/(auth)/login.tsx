@@ -1,8 +1,8 @@
 import { StyleSheet, View } from "react-native";
 
-import { LoginForm } from "../features/auth/components/LoginForm";
+import { LoginForm } from "@/features/auth/components/LoginForm";
 
-export default function LoginScreen(): JSX.Element {
+export default function LoginScreen() {
   return (
     <View style={styles.screen}>
       <LoginForm />

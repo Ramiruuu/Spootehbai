@@ -5,7 +5,7 @@ import { Button } from "../../../components/ui/Button";
 import { Input } from "../../../components/ui/Input";
 import { useAuth } from "../hooks/useAuth";
 
-export function LoginForm(): JSX.Element {
+export function LoginForm() {
   const { login, error, isLoading } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

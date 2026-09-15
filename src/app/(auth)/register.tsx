@@ -1,8 +1,8 @@
 import { StyleSheet, View } from "react-native";
 
-import { RegisterForm } from "../features/auth/components/RegisterForm";
+import { RegisterForm } from "@/features/auth/components/RegisterForm";
 
-export default function RegisterScreen(): JSX.Element {
+export default function RegisterScreen() {
   return (
     <View style={styles.screen}>
       <RegisterForm />
