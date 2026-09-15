@@ -12,7 +12,12 @@ describe("Input", () => {
 
   it("shows an error message when error prop is provided", async () => {
     const { getByText } = await render(
-      <Input label="Password" error="Password is required" />,
+      <Input
+        label="Password"
+        value=""
+        onChangeText={jest.fn()}
+        error="Password is required"
+      />,
     );
     expect(getByText("Password is required")).toBeTruthy();
   });
