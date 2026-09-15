@@ -1,9 +1,9 @@
 import { useMemo, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-import { Button } from "../../../components/ui/Button";
-import { Input } from "../../../components/ui/Input";
-import { useAuth } from "../hooks/useAuth";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 
 export function RegisterForm() {
   const { register, error, isLoading } = useAuth();
