@@ -6,6 +6,10 @@ import {
     type TextInputProps,
 } from "react-native";
 
+import { Colors } from "@/constants/colors";
+import { scale, verticalScale } from "@/constants/layout";
+import { Typography } from "@/constants/typography";
+
 export type InputProps = TextInputProps & {
   label: string;
   value: string;
@@ -20,6 +24,7 @@ export function Input({
   onChangeText,
   error,
   secureTextEntry = false,
+  style,
   ...rest
 }: InputProps) {
   const hasError = Boolean(error && error.trim().length > 0);
@@ -31,13 +36,9 @@ export function Input({
         value={value}
         onChangeText={onChangeText}
         secureTextEntry={secureTextEntry}
-        placeholderTextColor="#8A8A8A"
-        style={[
-          styles.input,
-          hasError && styles.inputError,
-          rest.style as object,
-        ]}
+        placeholderTextColor={Colors.lightGray}
         {...rest}
+        style={[styles.input, hasError && styles.inputError, style]}
       />
       {hasError ? <Text style={styles.errorText}>{error}</Text> : null}
     </View>
@@ -50,27 +51,26 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   label: {
-    marginBottom: 8,
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#1D1D1F",
+    ...Typography.label,
+    marginBottom: verticalScale(6),
+    color: Colors.spotifyWhite,
   },
   input: {
+    ...Typography.input,
     borderWidth: 1,
-    borderColor: "#D1D5DB",
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 16,
-    backgroundColor: "#FFFFFF",
-    color: "#111827",
+    borderColor: Colors.gray,
+    borderRadius: scale(8),
+    paddingHorizontal: scale(14),
+    paddingVertical: verticalScale(12),
+    backgroundColor: "transparent",
+    color: Colors.spotifyWhite,
   },
   inputError: {
-    borderColor: "#DC2626",
+    borderColor: Colors.error,
   },
   errorText: {
-    marginTop: 6,
-    color: "#DC2626",
-    fontSize: 12,
+    ...Typography.error,
+    marginTop: verticalScale(4),
+    color: Colors.error,
   },
 });

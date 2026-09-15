@@ -6,6 +6,10 @@ import {
     type PressableProps,
 } from "react-native";
 
+import { Colors } from "@/constants/colors";
+import { scale, verticalScale } from "@/constants/layout";
+import { Typography } from "@/constants/typography";
+
 export type ButtonProps = PressableProps & {
   title: string;
   onPress?: () => void;
@@ -20,6 +24,7 @@ export function Button({
   loading = false,
   disabled = false,
   variant = "primary",
+  style,
   ...rest
 }: ButtonProps) {
   const isDisabled = disabled || loading;
@@ -28,18 +33,21 @@ export function Button({
     <Pressable
       onPress={isDisabled ? undefined : onPress}
       disabled={isDisabled}
-      style={({ pressed }) => [
+      style={(state) => [
         styles.button,
         variant === "primary" ? styles.primary : styles.ghost,
         isDisabled && styles.disabled,
-        pressed && !isDisabled && styles.pressed,
+        state.pressed && !isDisabled && styles.pressed,
+        typeof style === "function" ? style(state) : style,
       ]}
       {...rest}
     >
       {loading ? (
         <ActivityIndicator
           size="small"
-          color={variant === "primary" ? "#FFFFFF" : "#1D4ED8"}
+          color={
+            variant === "primary" ? Colors.spotifyBlack : Colors.spotifyGreen
+          }
         />
       ) : (
         <Text
@@ -57,35 +65,34 @@ export function Button({
 
 const styles = StyleSheet.create({
   button: {
-    borderRadius: 12,
-    paddingVertical: 14,
+    borderRadius: scale(26),
+    height: verticalScale(52),
     paddingHorizontal: 16,
     alignItems: "center",
     justifyContent: "center",
     minHeight: 48,
   },
   primary: {
-    backgroundColor: "#2563EB",
+    backgroundColor: Colors.spotifyGreen,
   },
   ghost: {
     backgroundColor: "transparent",
     borderWidth: 1,
-    borderColor: "#D1D5DB",
+    borderColor: Colors.gray,
   },
   disabled: {
-    opacity: 0.6,
+    opacity: 0.5,
   },
   pressed: {
     opacity: 0.9,
   },
   text: {
-    fontSize: 16,
-    fontWeight: "600",
+    ...Typography.button,
   },
   primaryText: {
-    color: "#FFFFFF",
+    color: Colors.spotifyBlack,
   },
   ghostText: {
-    color: "#1F2937",
+    color: Colors.spotifyWhite,
   },
 });

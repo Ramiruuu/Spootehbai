@@ -29,13 +29,14 @@ export type LoginCredentials = {
  * This contract matches the sign-up form fields and the backend registration
  * request body.
  */
-export type RegisterPayload = {
-  username: string;
+export interface RegisterPayload {
+  firstName: string;
+  middleName?: string;
+  lastName: string;
+  age: number;
   email: string;
   password: string;
-  region: string;
-  dialect: string;
-};
+}
 
 /**
  * Successful response returned after login or register succeeds.

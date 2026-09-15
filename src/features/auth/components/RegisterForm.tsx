@@ -1,112 +1,129 @@
-import { useMemo, useState } from "react";
+import { useRouter } from "expo-router";
+import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { Colors } from "@/constants/colors";
+import { scale, verticalScale } from "@/constants/layout";
+import { Typography } from "@/constants/typography";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 
+type FormErrors = {
+  firstName?: string;
+  lastName?: string;
+  middleName?: string;
+  age?: string;
+  email?: string;
+  password?: string;
+  confirmPassword?: string;
+};
+
 export function RegisterForm() {
+  const router = useRouter();
   const { register, error, isLoading } = useAuth();
-  const [username, setUsername] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [middleName, setMiddleName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [age, setAge] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [region, setRegion] = useState("");
-  const [dialect, setDialect] = useState("");
-  const [localError, setLocalError] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [errors, setErrors] = useState<FormErrors>({});
 
-  const usernameError = useMemo(() => {
-    if (!username.trim()) return "Username is required.";
-    return "";
-  }, [username]);
+  const validate = (): FormErrors => {
+    const nextErrors: FormErrors = {};
+    const parsedAge = Number(age);
 
-  const emailError = useMemo(() => {
-    if (!email.trim()) return "Email is required.";
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailPattern.test(email)) return "Enter a valid email address.";
-    return "";
-  }, [email]);
-
-  const passwordError = useMemo(() => {
-    if (!password.trim()) return "Password is required.";
-    if (password.length < 8) return "Password must be at least 8 characters.";
-    return "";
-  }, [password]);
-
-  const regionError = useMemo(() => {
-    if (!region.trim()) return "Region is required.";
-    return "";
-  }, [region]);
-
-  const dialectError = useMemo(() => {
-    if (!dialect.trim()) return "Dialect is required.";
-    return "";
-  }, [dialect]);
-
-  const submitDisabled = Boolean(
-    usernameError ||
-    emailError ||
-    passwordError ||
-    regionError ||
-    dialectError ||
-    isLoading,
-  );
-
-  const handleSubmit = async (): Promise<void> => {
-    const nextUsernameError = !username.trim() ? "Username is required." : "";
-    const nextEmailError = !email.trim()
-      ? "Email is required."
-      : /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-        ? ""
-        : "Enter a valid email address.";
-    const nextPasswordError = !password.trim()
-      ? "Password is required."
-      : password.length < 8
-        ? "Password must be at least 8 characters."
-        : "";
-    const nextRegionError = !region.trim() ? "Region is required." : "";
-    const nextDialectError = !dialect.trim() ? "Dialect is required." : "";
-
-    if (
-      nextUsernameError ||
-      nextEmailError ||
-      nextPasswordError ||
-      nextRegionError ||
-      nextDialectError
-    ) {
-      setLocalError(
-        nextUsernameError ||
-          nextEmailError ||
-          nextPasswordError ||
-          nextRegionError ||
-          nextDialectError,
-      );
-      return;
+    if (!firstName.trim()) nextErrors.firstName = "First name is required.";
+    if (!lastName.trim()) nextErrors.lastName = "Last name is required.";
+    if (!age.trim()) {
+      nextErrors.age = "Age is required.";
+    } else if (!Number.isInteger(parsedAge) || parsedAge < 13) {
+      nextErrors.age = "You must be at least 13 years old.";
+    }
+    if (!email.trim()) {
+      nextErrors.email = "Email is required.";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      nextErrors.email = "Enter a valid email address.";
+    }
+    if (!password) {
+      nextErrors.password = "Password is required.";
+    } else if (password.length < 8) {
+      nextErrors.password = "Password must be at least 8 characters.";
+    }
+    if (!confirmPassword) {
+      nextErrors.confirmPassword = "Please confirm your password.";
+    } else if (confirmPassword !== password) {
+      nextErrors.confirmPassword = "Passwords do not match.";
     }
 
-    setLocalError("");
+    return nextErrors;
+  };
+
+  const handleSubmit = async (): Promise<void> => {
+    const nextErrors = validate();
+    setErrors(nextErrors);
+
+    if (Object.keys(nextErrors).length > 0) return;
 
     try {
       await register({
-        username,
-        email,
+        firstName: firstName.trim(),
+        middleName: middleName.trim() || undefined,
+        lastName: lastName.trim(),
+        age: Number(age),
+        email: email.trim(),
         password,
-        region,
-        dialect,
       });
+      router.replace("/(auth)/login");
     } catch {
-      // The hook already stores the auth error for UI display.
+      // The auth hook exposes the API error for display below.
     }
   };
 
   return (
     <View style={styles.container}>
+      <Text style={styles.heading}>
+        Sign up to start listening on Spootehbai
+      </Text>
+      <Text style={styles.subtext}>It's free and only takes a minute.</Text>
+
+      <View style={styles.row}>
+        <View style={styles.column}>
+          <Input
+            label="First Name"
+            value={firstName}
+            onChangeText={setFirstName}
+            autoCapitalize="words"
+            error={errors.firstName}
+          />
+        </View>
+        <View style={styles.column}>
+          <Input
+            label="Last Name"
+            value={lastName}
+            onChangeText={setLastName}
+            autoCapitalize="words"
+            error={errors.lastName}
+          />
+        </View>
+      </View>
+
       <Input
-        label="Username"
-        value={username}
-        onChangeText={setUsername}
-        autoCapitalize="none"
-        autoCorrect={false}
-        error={usernameError || localError}
+        label="Middle Name"
+        value={middleName}
+        onChangeText={setMiddleName}
+        autoCapitalize="words"
+        error={errors.middleName}
+      />
+
+      <Input
+        label="Age"
+        value={age}
+        onChangeText={setAge}
+        keyboardType="numeric"
+        error={errors.age}
       />
 
       <Input
@@ -116,43 +133,45 @@ export function RegisterForm() {
         keyboardType="email-address"
         autoCapitalize="none"
         autoCorrect={false}
-        error={emailError}
+        error={errors.email}
       />
 
-      <Input
-        label="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        autoCapitalize="none"
-        autoCorrect={false}
-        error={passwordError}
-      />
-
-      <Input
-        label="Region"
-        value={region}
-        onChangeText={setRegion}
-        autoCapitalize="words"
-        error={regionError}
-      />
-
-      <Input
-        label="Dialect"
-        value={dialect}
-        onChangeText={setDialect}
-        autoCapitalize="words"
-        error={dialectError}
-      />
+      <View style={styles.row}>
+        <View style={styles.column}>
+          <Input
+            label="Password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            autoCapitalize="none"
+            autoCorrect={false}
+            error={errors.password}
+          />
+        </View>
+        <View style={styles.column}>
+          <Input
+            label="Confirm Password"
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            secureTextEntry
+            autoCapitalize="none"
+            autoCorrect={false}
+            error={errors.confirmPassword}
+          />
+        </View>
+      </View>
 
       {error ? <Text style={styles.authError}>{error.message}</Text> : null}
 
       <Button
-        title="Create Account"
+        title="Sign Up"
         onPress={handleSubmit}
         loading={isLoading}
-        disabled={submitDisabled}
+        disabled={isLoading}
+        style={styles.submitButton}
       />
+
+      <Text style={styles.note}>By signing up, you agree to our Terms.</Text>
     </View>
   );
 }
@@ -160,11 +179,42 @@ export function RegisterForm() {
 const styles = StyleSheet.create({
   container: {
     width: "100%",
-    gap: 12,
+    backgroundColor: Colors.spotifyBlack,
+    gap: verticalScale(16),
+  },
+  heading: {
+    ...Typography.title,
+    color: Colors.spotifyWhite,
+    textAlign: "center",
+    marginBottom: verticalScale(8),
+  },
+  subtext: {
+    ...Typography.subtitle,
+    color: Colors.lightGray,
+    textAlign: "center",
+    marginBottom: verticalScale(16),
+  },
+  row: {
+    flexDirection: "row",
+    gap: scale(12),
+  },
+  column: {
+    flex: 1,
   },
   authError: {
-    color: "#DC2626",
-    fontSize: 13,
-    marginTop: 4,
+    ...Typography.error,
+    color: Colors.error,
+  },
+  submitButton: {
+    backgroundColor: Colors.spotifyGreen,
+    borderRadius: scale(26),
+    height: verticalScale(52),
+    marginTop: verticalScale(8),
+  },
+  note: {
+    ...Typography.caption,
+    color: Colors.lightGray,
+    marginTop: verticalScale(8),
+    textAlign: "center",
   },
 });

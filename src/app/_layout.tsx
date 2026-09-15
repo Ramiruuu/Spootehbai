@@ -1,37 +1,42 @@
-import { Redirect, Slot, useRouter, useSegments } from "expo-router";
+import {
+    Stack,
+    useRootNavigationState,
+    useRouter,
+    useSegments,
+} from "expo-router";
 import { useEffect } from "react";
-import { ActivityIndicator, StyleSheet, View } from "react-native";
 
-import { AuthProvider, useAuth } from "../features/auth/hooks/useAuth";
+import { LoadingScreen } from "@/components/ui/LoadingScreen";
+import { AuthProvider, useAuth } from "@/features/auth/hooks/useAuth";
 
 function AppGate() {
-  const { user, isLoading } = useAuth();
   const segments = useSegments();
   const router = useRouter();
+  const rootNavigationState = useRootNavigationState();
+  const { user, isLoading } = useAuth();
 
   useEffect(() => {
-    if (isLoading) return;
+    if (isLoading || !rootNavigationState?.key) return;
 
-    const isAuthRoute = segments[0] === "login" || segments[0] === "register";
+    const inAuthGroup = segments[0] === "(auth)";
 
-    if (!user && !isAuthRoute) {
+    if (!user?.id && !inAuthGroup) {
       router.replace("/(auth)/login");
+    } else if (user?.id && inAuthGroup) {
+      router.replace("/explore");
     }
-  }, [isLoading, router, segments, user]);
+  }, [isLoading, rootNavigationState?.key, router, segments, user]);
 
   if (isLoading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" />
-      </View>
-    );
+    return <LoadingScreen />;
   }
 
-  if (!user) {
-    return <Redirect href="/(auth)/login" />;
-  }
-
-  return <Slot />;
+  return (
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="(auth)" />
+      <Stack.Screen name="explore" />
+    </Stack>
+  );
 }
 
 export default function RootLayout() {
@@ -41,12 +46,3 @@ export default function RootLayout() {
     </AuthProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#F5F7FB",
-  },
-});
