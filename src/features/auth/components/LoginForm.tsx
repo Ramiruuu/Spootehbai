@@ -45,7 +45,7 @@ export function LoginForm() {
     try {
       await login({ email, password });
     } catch {
-      // The hook already stores the auth error for UI display.
+
     }
   };
 
